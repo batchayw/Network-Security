@@ -1,0 +1,49 @@
+version: "3.8"
+services:
+  openvpn:
+    image: kylemanna/openvpn
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    ports:
+      - "1194:1194/udp"
+    volumes:
+      - ./configs/openvpn:/etc/openvpn
+    networks:
+      - dmz-net
+
+  bastion:
+    image: rastasheep/ubuntu-sshd:18.04
+    ports:
+      - "2222:22"
+    networks:
+      - dmz-net
+      - internal-net
+
+  waf:
+    image: owasp/modsecurity-crs:nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./configs/modsecurity:/etc/modsecurity.d
+    networks:
+      - dmz-net
+
+  honeypot:
+    image: cowrie/cowrie
+    ports:
+      - "2223:2222"
+    volumes:
+      - ./configs/cowrie:/etc/cowrie
+    networks:
+      - dmz-net
+
+  internal-server:
+    image: httpd
+    networks:
+      - internal-net
+
+networks:
+  dmz-net:         
+  internal-net:     
