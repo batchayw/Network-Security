@@ -1,0 +1,5 @@
+# Ignorer les fichiers temporaires et sensibles
+*.log
+*.key
+*.crt
+*.pem
